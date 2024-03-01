@@ -3,85 +3,157 @@ package com.example.eventapp
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.BatteryManager
+import android.media.MediaPlayer
+import android.net.wifi.SupplicantState
+import android.net.wifi.WifiInfo
+import android.net.wifi.WifiManager
 import android.provider.Settings
-import android.util.Log
+import com.example.eventapp.pref.MyShared
 
 class BroadcastReceiver : BroadcastReceiver() {
+    private lateinit var mediaPlayer: MediaPlayer
     override fun onReceive(context: Context?, intent: Intent?) {
         val musicIntent = Intent(context, MusicService::class.java)
+        mediaPlayer = MediaPlayer.create(context, R.raw.salom)
+
         when (intent?.action) {
             Intent.ACTION_BATTERY_LOW -> {
-//                musicIntent.action = MusicService.ACTION_BATTERY_LOW
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_BATTERY_LOW)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.battery_low)
+                        mediaPlayer.start()
+                    }
+                }
             }
 
             Intent.ACTION_AIRPLANE_MODE_CHANGED -> {
                 if (context?.let { isAirplaneModeOn(it) } == true) {
-                    MusicService.ACTION_PLAY = R.raw.airplane_off
+                    if (MyShared.getSwitcher("${Intent.ACTION_AIRPLANE_MODE_CHANGED}on") == 1) {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.airplane_on)
+                        mediaPlayer.start()
+                    }
                 } else {
-                    MusicService.ACTION_PLAY = R.raw.airplane_on
+                    if (MyShared.getSwitcher("${Intent.ACTION_AIRPLANE_MODE_CHANGED}off") == 1) {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.airplane_off)
+                        mediaPlayer.start()
+                    }
                 }
-                context?.startService(musicIntent)
             }
 
             Intent.ACTION_BATTERY_OKAY -> {
-//                musicIntent.action = MusicService.ACTION_BATTERY_LOW
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_BATTERY_OKAY)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.battery_full)
+                        mediaPlayer.start()
+                    }
+                }
             }
 
-            Intent.ACTION_CALL -> {
-//                musicIntent.action = MusicService.ACTION_CALL
-                context?.startService(musicIntent)
-            }
 
-            Intent.ACTION_DATE_CHANGED -> {
-                context?.startService(musicIntent)
-            }
+//            Intent.ACTION_DATE_CHANGED -> {
+//
+//            }
 
             Intent.ACTION_SCREEN_ON -> {
-                MusicService.ACTION_PLAY = R.raw.ekran_yondi
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_SCREEN_ON)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.ekran_yondi)
+                        mediaPlayer.start()
+                    }
+                }
             }
 
             Intent.ACTION_SCREEN_OFF -> {
-                MusicService.ACTION_PLAY = R.raw.ekran_ochdi
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_SCREEN_OFF)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.ekran_ochdi)
+                        mediaPlayer.start()
+                    }
+                }
             }
 
             Intent.ACTION_POWER_CONNECTED -> {
-                MusicService.ACTION_PLAY = R.raw.power_connected
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_POWER_CONNECTED)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.power_connected)
+                        mediaPlayer.start()
+                    }
+                }
+
             }
 
             Intent.ACTION_POWER_DISCONNECTED -> {
-                MusicService.ACTION_PLAY = R.raw.power_disconnected
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_POWER_DISCONNECTED)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.power_disconnected)
+                        mediaPlayer.start()
+                    }
+                }
+
             }
 
             Intent.ACTION_TIMEZONE_CHANGED -> {
-                context?.startService(musicIntent)
+                when (MyShared.getSwitcher(Intent.ACTION_TIMEZONE_CHANGED)) {
+                    1 -> {
+                        if(mediaPlayer.isPlaying) return
+                        mediaPlayer = MediaPlayer.create(context, R.raw.vaqt)
+                        mediaPlayer.start()
+                    }
+                }
+            }
+            "android.bluetooth.device.action.ACL_CONNECTED" -> {
+//                MusicService.ACTION_PLAY = R.raw.vaqt
+//                context?.startService(musicIntent)
             }
 
-            Intent.ACTION_TIME_CHANGED -> {
-                context?.startService(musicIntent)
+            "android.bluetooth.device.action.ACL_DISCONNECTED" -> {
+//                MusicService.ACTION_PLAY = R.raw.vaqt
+//                context?.startService(musicIntent)
+            }
+            "android.net.wifi.STATE_CHANGE" -> {
+                when (MyShared.getSwitcher("android.net.wifi.STATE_CHANGECON")) {
+                    1 -> {
+                        val wifiInfo: WifiInfo? = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO)
+                        if (wifiInfo != null) {
+                            val supplicantState = wifiInfo.supplicantState
+                            if (supplicantState == SupplicantState.COMPLETED) {
+                                if(mediaPlayer.isPlaying) return
+                                mediaPlayer = MediaPlayer.create(context, R.raw.wifi_connected)
+                                mediaPlayer.start()
+                            } else {
+//                        // Wi-Fi is not connected
+//                        if(mediaPlayer.isPlaying
+ return//                        mediaPlayer = MediaPlayer.create(context, R.raw.wifi_disconnected)
+//                        mediaPlayer.start()
+                            }
+                        }
+                    }
+                }
+
+                when (MyShared.getSwitcher("android.net.wifi.STATE_CHANGEDISCON")) {
+                    1 -> {
+                        val wifiInfo: WifiInfo? = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO)
+                        if (wifiInfo == null) {
+                            if(mediaPlayer.isPlaying) return
+                            mediaPlayer = MediaPlayer.create(context, R.raw.wifi_disconnected)
+                            mediaPlayer.start()
+                        }
+                    }
+                }
             }
         }
-        Log.d("TAG", "onReceive: Ishladi ${context.toString()}")
-//        intent?.extras?.get(BatteryManager.EXTRA_LEVEL)
+    }
 
-        if (intent?.action == Intent.ACTION_BATTERY_CHANGED) {
-            val status: Int = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+    fun clearReceiver() {
 
-            // Tizim batareyasi quvvat oldi
-            if (status == BatteryManager.BATTERY_STATUS_FULL || status == BatteryManager.BATTERY_STATUS_CHARGING) {
-                // Musiqa qo'yish uchun Intent yaratish
-                val musicIntent = Intent(context, MusicService::class.java)
-
-                // Musiqa xizmatini ishga tushirish
-
-            }
-        }
     }
 
     private fun isAirplaneModeOn(context: Context): Boolean {
