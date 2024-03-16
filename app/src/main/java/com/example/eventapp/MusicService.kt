@@ -26,6 +26,7 @@ class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
         return if (intent?.extras?.get("STOP") != "STOP") {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(receiver, registerReceiver(), RECEIVER_EXPORTED)
@@ -35,6 +36,8 @@ class MusicService : Service() {
             stopSelf()
             START_NOT_STICKY
         }
+
+
     }
     private fun registerReceiver() : IntentFilter {
         val intentFilter = IntentFilter()

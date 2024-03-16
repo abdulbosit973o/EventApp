@@ -13,7 +13,6 @@ import com.example.eventapp.pref.MyShared
 class BroadcastReceiver : BroadcastReceiver() {
     private lateinit var mediaPlayer: MediaPlayer
     override fun onReceive(context: Context?, intent: Intent?) {
-        val musicIntent = Intent(context, MusicService::class.java)
         mediaPlayer = MediaPlayer.create(context, R.raw.salom)
 
         when (intent?.action) {

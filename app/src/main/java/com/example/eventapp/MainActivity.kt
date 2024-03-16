@@ -1,10 +1,18 @@
 package com.example.eventapp
 
 import android.Manifest
+import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.Gravity
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.eventapp.databinding.ActivityMainBinding
 import com.example.eventapp.pref.MyShared
@@ -13,19 +21,18 @@ import com.example.eventapp.pref.myLog
 class MainActivity : AppCompatActivity() {
     private val batteryReceiver = BroadcastReceiver()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var dialog : Dialog
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        dialog = Dialog(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             checkPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS)) {
-
             }
         }
-
         setSwitchedSwitchers()
-
         val musicIntent = Intent(this, MusicService::class.java)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             this.startForegroundService(musicIntent)
@@ -93,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
+        binding.option.setOnClickListener { showBottomSheetDialog() }
 
         binding.switcherWifiCon.setOnClickListener {
             val switcher = MyShared.getSwitcher("android.net.wifi.STATE_CHANGECON")
@@ -239,6 +247,52 @@ class MainActivity : AppCompatActivity() {
         intentFilter.addAction("android.net.wifi.STATE_CHANGE")
         return intentFilter
     }
+
+    fun showBottomSheetDialog() {
+
+        dialog.setContentView(R.layout.dialog_edit_delete)
+
+
+        dialog.findViewById<TextView>(R.id.share).setOnClickListener{
+            val intent = Intent(Intent.ACTION_SEND)
+            val shareBody = "Event App ilovasini bu yerdan yuklab olishingiz mumkin "+ "https://play.google.com/store/apps/details?id=org.telegram.messenger"
+            intent.setType("text/plain")
+            intent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                getString(androidx.appcompat.R.string.abc_action_bar_home_description)
+            )
+            intent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            startActivity(Intent.createChooser(intent, getString(R.string.app_name)))
+        }
+        dialog.findViewById<TextView>(R.id.feedback).setOnClickListener{
+            val intent = Intent(Intent.ACTION_SEND)
+            val recipients = arrayOf("abdulbosit9730@gmail.com")
+            intent.putExtra(Intent.EXTRA_EMAIL, recipients)
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Subject text here...")
+            intent.putExtra(Intent.EXTRA_TEXT, "Body of the content here...")
+            intent.putExtra(Intent.EXTRA_CC, "mailcc@gmail.com")
+            intent.setType("text/html")
+            intent.setPackage("com.google.android.gm")
+            startActivity(Intent.createChooser(intent, "Send mail"))
+        }
+        dialog.findViewById<TextView>(R.id.rate).setOnClickListener{
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${this.packageName}")))
+            } catch (e: ActivityNotFoundException) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=${this.packageName}")))
+            }
+
+        }
+
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawable(ColorDrawable( Color.TRANSPARENT))
+        dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+        dialog.window?.setGravity(Gravity.BOTTOM)
+
+    }
+
 
     override fun onDestroy() {
         super.onDestroy()
