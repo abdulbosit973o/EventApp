@@ -3,7 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
     android:background="@drawable/bg_dialog_reset">
 
     <ImageView
@@ -34,7 +33,8 @@
         android:id="@+id/image1"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:background="@drawable/bg_dialog_line"
+        android:padding="12dp"
+        android:src="@drawable/share"
         app:layout_constraintBottom_toBottomOf="@+id/share"
         app:layout_constraintEnd_toStartOf="@id/share"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,10 +59,11 @@
         android:id="@+id/image2"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:background="@drawable/bg_dialog_line"
+        android:src="@drawable/rate"
         app:layout_constraintBottom_toBottomOf="@+id/rate"
         app:layout_constraintEnd_toStartOf="@id/share"
         android:layout_marginEnd="16dp"
+        android:padding="12dp"
         app:layout_constraintStart_toStartOf="@id/image1"
         app:layout_constraintTop_toTopOf="@id/rate" />
 
@@ -87,7 +88,8 @@
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_dialog_line"
+        android:src="@drawable/review"
+        android:padding="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/feedback"
         app:layout_constraintEnd_toStartOf="@id/share"
         app:layout_constraintStart_toStartOf="parent"
